@@ -82,3 +82,31 @@ Query the `scored_payments` table to see the results:
 ```sql
 SELECT * FROM scored_payments ORDER BY processed_at DESC;
 ```
+
+## 🧪 Test Data
+
+### Sample Kafka Message
+The producer sends JSON messages containing transaction details (Time, Anonymized Features V1-V28, Amount).
+
+```json
+{
+  "Time": 406.0,
+  "V1": -2.3122265423263,
+  "V2": 1.95199201064158,
+  "V3": -1.60985073229769,
+  "...": "...",
+  "V28": 0.0203350465249512,
+  "Amount": 179.99
+}
+```
+
+### MySQL Schema
+The learner (consumer) creates and populates the `scored_payments` table:
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `BIGINT` (PK) | Kafka Message Offset |
+| `amount` | `DECIMAL(15, 2)` | Transaction Amount |
+| `fraud_score` | `FLOAT` | XGBoost Probability Score |
+| `is_fraud` | `TINYINT(1)` | 1 if score > 0.6, else 0 |
+| `processed_at` | `TIMESTAMP` | Record insertion time |
